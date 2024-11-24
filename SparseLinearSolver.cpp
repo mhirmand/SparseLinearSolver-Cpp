@@ -6,7 +6,7 @@
 namespace SparseSolver {
 
   // constructor for SparseMatrix class
-  SparseMatrix::SparseMatrix(size_t rows, size_t cols, size_t nnz)
+  SparseMatrix::SparseMatrix(int rows, int cols, int nnz)
     : numRows(rows), numCols(cols), numNonZero(nnz), finalized(false), currentNNZ(0) {
     values = new double[numNonZero];
     rowIndex = new int[numRows + 1] {0};
@@ -21,7 +21,7 @@ namespace SparseSolver {
   }
 
   // method to add value to the matrix
-  void SparseMatrix::addValue(size_t row, size_t col, double value) {
+  void SparseMatrix::addValue(int* rows, int* cols, double* vals, int nVals) {
 
     // check if the matrix is finalized
     if (finalized) {
@@ -34,10 +34,21 @@ namespace SparseSolver {
     }
 
     // add the value to the matrix
-    values[currentNNZ] = value;
-    colIndex[currentNNZ] = col;
-    rowIndex[row + 1]++;
-    currentNNZ++;
+    int r = 0;
+    int c = 0;
+    double val = 0.0;
+    for (int i = 0; i < nVals; i++) {
+      r = rows[i];
+      c = cols[i];
+      val = vals[i];
+      if (r >= numRows || c >= numCols) {
+        throw std::out_of_range("Row or column index out of range.");
+      }
+      values[currentNNZ] = val;
+      colIndex[currentNNZ] = c;
+      rowIndex[r + 1]++;
+      currentNNZ++;
+    }
   }
 
   // method to finalize the matrix
@@ -46,18 +57,14 @@ namespace SparseSolver {
   void SparseMatrix::finalize() {
     if (finalized) return;
 
-    for (size_t i = 1; i <= numRows; ++i) {
+    for (int i = 1; i <= numRows; ++i) {
       rowIndex[i] += rowIndex[i - 1];
     }
     finalized = true;
   }
 
   // solve the linear system Ax = b
-  void Solver::solve(const SparseMatrix& A, const double* b, double* x) {
-    // Step 1: Create a mutable copy of `b`
-    double* bcopy = new double[A.numRows];
-    memcpy(bcopy, b, sizeof(*(A.values)) * A.numRows);
-
+  void Solver::solve(SparseMatrix& A, double *& b) {
     size_t n = A.numRows;
 
     // Forward elimination
@@ -80,7 +87,7 @@ namespace SparseSolver {
       for (int idx = A.rowIndex[k]; idx < A.rowIndex[k + 1]; ++idx) {
         A.values[idx] /= diag;
       }
-      bcopy[k] /= diag;
+      b[k] /= diag;
 
       // Eliminate below
       for (size_t i = k + 1; i < n; ++i) {
@@ -97,24 +104,20 @@ namespace SparseSolver {
             int col = A.colIndex[idx];
             A.values[idx] -= factor * A.values[A.rowIndex[k] + (col - k)];
           }
-          bcopy[i] -= factor * bcopy[k];
+          b[i] -= factor * b[k];
         }
       }
     }
 
     // Back substitution
     for (int i = n - 1; i >= 0; --i) {
-      x[i] = bcopy[i];
       for (int idx = A.rowIndex[i]; idx < A.rowIndex[i + 1]; ++idx) {
         int col = A.colIndex[idx];
         if (col > i) {
-          x[i] -= A.values[idx] * x[col];
+          b[i] -= A.values[idx] * b[col];
         }
       }
     }
-
-    // Step 4: Clean up
-    delete[] bcopy;
   }
 
   // backward substitution
@@ -125,9 +128,8 @@ namespace SparseSolver {
 
 
   // forward substitution
-  void Solver::backwardSubstitution(const SparseMatrix& A, const double* b, double* &x) {
-
+  void Solver::backwardSubstitution(const SparseMatrix& A, double*& x) {
 
     return;
-	}
+  }
 }
