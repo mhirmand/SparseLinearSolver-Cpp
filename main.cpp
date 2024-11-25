@@ -3,9 +3,11 @@
 #include <cmath>
 #include "SparseLinearSolver.h"
 
-#define EPSILON 1e-6 // Tolerance for floating-point comparisons
+#define EPSILON 1e-10 // Tolerance for floating-point comparisons
 
-void testSimpleSystem() {
+int testSimpleSystem() {
+
+  int nError = 0;
 
   const int n = 3; // 3x3 system
   const int nnz = 7; // Number of non-zero elements
@@ -26,23 +28,33 @@ void testSimpleSystem() {
 
 	// Finalize the matrix
 	A.finalize();
-  // Solve the system
-	SparseSolver::Solver::solve(A, b);
 
-	// Check the solution
-	assert(std::fabs(b[0] - 1.5) < EPSILON);
-	assert(std::fabs(b[1] - 3.5) < EPSILON);
-	assert(std::fabs(b[2] + 1.5) < EPSILON);
 
-	std::cout << "Test Simple System: Passed" << std::endl;
+  try {
+    // Solve the system
+    SparseSolver::Solver::solve(A, b);
+
+    // Check the solution
+    assert(std::fabs(b[0] - 1.5) < EPSILON);
+    assert(std::fabs(b[1] - 3.5) < EPSILON);
+    assert(std::fabs(b[2] + 1.5) < EPSILON);
+    std::cout << "Test Simple System: Passed" << std::endl;
+  }
+  catch (const std::runtime_error& e) {
+    std::cout << "Test Simple Matrix: Failed (" << e.what() << ")" << std::endl;
+    nError = 1;
+  }
 
 	// clean memory
 	delete[] b;
 	b = nullptr;
 
+  return nError;
 }
 
-void testSingularMatrix() {
+int testSingularMatrix() {
+  int nError = 0;
+
   const int n = 2;
   const int nnz = 2;
 
@@ -63,6 +75,8 @@ void testSingularMatrix() {
   try {
     SparseSolver::Solver::solve(A, b);
     assert(false); // Should not reach here
+    std::cout << "Test Singular System: Failed" << std::endl;
+    nError = 1;
   }
   catch (const std::runtime_error& e) {
     std::cout << "Test Singular Matrix: Passed (" << e.what() << ")" << std::endl;
@@ -70,9 +84,14 @@ void testSingularMatrix() {
 
   delete[] b; 
   b = nullptr;
+
+
+  return nError;
 }
 
-void testZeroMatrix() {
+int testZeroMatrix() {
+
+  int nError = 0;
   const int n = 3;
   const int nnz = 0;
 
@@ -88,6 +107,8 @@ void testZeroMatrix() {
   try {
     SparseSolver::Solver::solve(A, b);
     assert(false); // Should not reach here
+    std::cout << "Test Zero System: Failed" << std::endl;
+    nError = 1;
   }
   catch (const std::runtime_error& e) {
     std::cout << "Test Zero Matrix: Passed (" << e.what() << ")" << std::endl;
@@ -96,9 +117,14 @@ void testZeroMatrix() {
   // clean memory
   delete[] b;
   b = nullptr;
+
+  return nError;
 }
 
-void testRectangularMatrix() {
+int testRectangularMatrix() {
+
+  int nError = 0;
+
   const int nrows = 3;
   const int ncols = 2; // Rectangular matrix (non-square)
   const int nnz = 4;
@@ -121,6 +147,8 @@ void testRectangularMatrix() {
   try {
     SparseSolver::Solver::solve(A, b);
     assert(false); // Should not reach here
+    std::cout << "Test Rectangular System: Failed" << std::endl;
+    nError = 1;
   }
   catch (const std::runtime_error& e) {
     std::cout << "Test Rectangular Matrix: Passed (" << e.what() << ")" << std::endl;
@@ -128,9 +156,14 @@ void testRectangularMatrix() {
 
   delete[] b;
   b = nullptr;
+
+  return nError;
 }
 
-void testDiagonalSparseSystem() {
+int testDiagonalSparseSystem() {
+
+  int nError = 0;
+
   const int n = 5;
   const int nnz = 5;
 
@@ -151,6 +184,9 @@ void testDiagonalSparseSystem() {
 
   A.finalize();
 
+
+  try
+  {
   // Solve the system
   SparseSolver::Solver::solve(A, b);
 
@@ -162,18 +198,34 @@ void testDiagonalSparseSystem() {
   assert(std::fabs(b[4] - 0.5) < EPSILON);
 
   std::cout << "Test Diagonal Sparse System: Passed" << std::endl;
+  }
+  catch (const std::runtime_error& e)
+  {
+    std::cout << "Test Diagonal System: Failed(" << e.what() << ")" << std::endl;
+    nError = 1;
+  }
+
 
   delete[] b;
   b = nullptr;
+
+  return nError;
 }
 
 int main() {
-  testSimpleSystem();
-  testSingularMatrix();
-  testZeroMatrix();
-  testRectangularMatrix();
-  testDiagonalSparseSystem();
 
-  std::cout << "All tests passed!" << std::endl;
+  int failed = 0, ntests = 0;
+  failed += testSimpleSystem();
+  ntests++;
+  failed += testSingularMatrix();
+  ntests++;
+  failed += testZeroMatrix();
+  ntests++;
+  failed += testRectangularMatrix();
+  ntests++;
+  failed += testDiagonalSparseSystem();
+  ntests++;
+
+  std::cout << (ntests - failed) << "/" << ntests << " tests passed!" << std::endl;
   return 0;
 }
