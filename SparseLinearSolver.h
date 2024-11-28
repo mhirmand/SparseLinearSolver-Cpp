@@ -32,7 +32,7 @@ namespace SparseSolver {
 	public:
 		static void solve(SparseMatrix& A, double *& b);
 	private:
-		static void forwardSubstitution(const SparseMatrix& A, double*& b);
+		static void forwardElimination(const SparseMatrix& A, double*& b);
 		static void backwardSubstitution(const SparseMatrix& A, double*& b);
 	};
 

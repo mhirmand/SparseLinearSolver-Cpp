@@ -8,16 +8,29 @@ namespace SparseSolver {
   // constructor for SparseMatrix class
   SparseMatrix::SparseMatrix(int rows, int cols, int nnz)
     : numRows(rows), numCols(cols), numNonZero(nnz), finalized(false), currentNNZ(0) {
-    values = new double[numNonZero];
-    rowIndex = new int[numRows + 1] {0};
-    colIndex = new int[numNonZero];
+    values = nullptr;
+    colIndex = nullptr;
+    rowIndex = nullptr;
+    if (numNonZero > 0)
+    {
+      values = new double[numNonZero] {0.0};
+      colIndex = new int[numNonZero];
+    }
+    if (numRows > 0)
+      rowIndex = new int[numRows + 1] {0};
+    
   }
 
   // deconstructor for SparseMatrix class
   SparseMatrix::~SparseMatrix() {
     delete[] values;
+    values = nullptr;
+
     delete[] rowIndex;
+    rowIndex = nullptr;
+
     delete[] colIndex;
+    colIndex = nullptr;
   }
 
   // method to add value to the matrix
@@ -65,13 +78,25 @@ namespace SparseSolver {
 
   // solve the linear system Ax = b
   void Solver::solve(SparseMatrix& A, double *& b) {
-    size_t n = A.numRows;
+    
+    // Step 1: Perform forward elimination
+    forwardElimination(A, b);
+
+    // Step 2: Perform backward substitution
+    backwardSubstitution(A, b);
+
+  }
+
+  // backward substitution
+  void Solver::forwardElimination(const SparseMatrix& A, double*& b) {
+
+    int n = A.numRows;
 
     // Forward elimination
-    for (size_t k = 0; k < n; ++k) {
+    for (int k = 0; k < n; ++k) {
       // Find diagonal element in row k
       double diag = 0.0;
-      size_t diagIndex = 0;
+      int diagIndex = 0;
       for (int idx = A.rowIndex[k]; idx < A.rowIndex[k + 1]; ++idx) {
         if (A.colIndex[idx] == k) {
           diag = A.values[idx];
@@ -90,7 +115,7 @@ namespace SparseSolver {
       b[k] /= diag;
 
       // Eliminate below
-      for (size_t i = k + 1; i < n; ++i) {
+      for (int i = k + 1; i < n; ++i) {
         double factor = 0.0;
         for (int idx = A.rowIndex[i]; idx < A.rowIndex[i + 1]; ++idx) {
           if (A.colIndex[idx] == k) {
@@ -108,28 +133,23 @@ namespace SparseSolver {
         }
       }
     }
-
-    // Back substitution
-    for (int i = n - 1; i >= 0; --i) {
-      for (int idx = A.rowIndex[i]; idx < A.rowIndex[i + 1]; ++idx) {
-        int col = A.colIndex[idx];
-        if (col > i) {
-          b[i] -= A.values[idx] * b[col];
-        }
-      }
-    }
-  }
-
-  // backward substitution
-  void Solver::forwardSubstitution(const SparseMatrix& A, double*& b) {
-
     return;
   }
-
 
   // forward substitution
   void Solver::backwardSubstitution(const SparseMatrix& A, double*& x) {
 
+    int n = A.numRows;
+
+    // Backward substitution
+    for (int i = n - 1; i >= 0; --i) {
+      for (int idx = A.rowIndex[i]; idx < A.rowIndex[i + 1]; ++idx) {
+        int col = A.colIndex[idx];
+        if (col > i) {
+          x[i] -= A.values[idx] * x[col];
+        }
+      }
+    }
     return;
   }
 }
