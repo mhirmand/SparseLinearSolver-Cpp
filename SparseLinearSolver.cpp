@@ -33,7 +33,7 @@ namespace SparseSolver {
     colIndex = nullptr;
   }
 
-  // method to add value to the matrix
+  // method to add values to the matrix
   void SparseMatrix::addValue(int* rows, int* cols, double* vals, int nVals) {
 
     // check if the matrix is finalized
@@ -42,18 +42,15 @@ namespace SparseSolver {
     }
 
     // check if too many non-zero elements are added
-    if (currentNNZ >= numNonZero) {
+    if (currentNNZ + nVals > numNonZero) {
       throw std::overflow_error("Exceeded the allocated non-zero elements.");
     }
 
     // add the value to the matrix
-    int r = 0;
-    int c = 0;
-    double val = 0.0;
     for (int i = 0; i < nVals; i++) {
-      r = rows[i];
-      c = cols[i];
-      val = vals[i];
+      int r = rows[i];
+      int c = cols[i];
+      double val = vals[i];
       if (r >= numRows || c >= numCols) {
         throw std::out_of_range("Row or column index out of range.");
       }
@@ -65,7 +62,7 @@ namespace SparseSolver {
   }
 
   // method to finalize the matrix
-  // it transitions the matrix from its user - friendly input format to 
+  // it transitions the matrix from its user-friendly input format to 
   // the compact Compressed Row Storage(CRS) format.
   void SparseMatrix::finalize() {
     if (finalized) return;
@@ -77,8 +74,12 @@ namespace SparseSolver {
   }
 
   // solve the linear system Ax = b
-  void Solver::solve(SparseMatrix& A, double *& b) {
+  void Solver::solve(SparseMatrix& A, double *& b, const double tolerance) {
     
+		if (!A.isFinalized()) {
+			throw std::logic_error("Matrix is not finalized.");
+		}
+
     // Step 1: Perform forward elimination
     forwardElimination(A, b);
 
@@ -88,7 +89,7 @@ namespace SparseSolver {
   }
 
   // backward substitution
-  void Solver::forwardElimination(const SparseMatrix& A, double*& b) {
+  void Solver::forwardElimination(const SparseMatrix& A, double*& b, const double tolerance) {
 
     int n = A.numRows;
 
@@ -104,7 +105,7 @@ namespace SparseSolver {
           break;
         }
       }
-      if (std::fabs(diag) < 1e-10) {
+      if (std::fabs(diag) < tolerance) {
         throw std::runtime_error("Matrix is singular or nearly singular.");
       }
 

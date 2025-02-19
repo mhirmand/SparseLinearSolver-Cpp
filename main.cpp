@@ -3,7 +3,7 @@
 #include <cmath>
 #include "SparseLinearSolver.h"
 
-#define EPSILON 1e-10 // Tolerance for floating-point comparisons
+using namespace SparseSolver;
 
 int testSimpleSystem() {
 
@@ -35,9 +35,9 @@ int testSimpleSystem() {
     SparseSolver::Solver::solve(A, b);
 
     // Check the solution
-    assert(std::fabs(b[0] - 1.5) < EPSILON);
-    assert(std::fabs(b[1] - 3.5) < EPSILON);
-    assert(std::fabs(b[2] + 1.5) < EPSILON);
+    assert(std::fabs(b[0] - 1.5) < epsilon);
+    assert(std::fabs(b[1] - 3.5) < epsilon);
+    assert(std::fabs(b[2] + 1.5) < epsilon);
     std::cout << "Test Simple System: Passed" << std::endl;
   }
   catch (const std::runtime_error& e) {
@@ -191,11 +191,11 @@ int testDiagonalSparseSystem() {
   SparseSolver::Solver::solve(A, b);
 
   // Check the solution
-  assert(std::fabs(b[0] - 0.1) < EPSILON);
-  assert(std::fabs(b[1] - 0.2) < EPSILON);
-  assert(std::fabs(b[2] - 0.3) < EPSILON);
-  assert(std::fabs(b[3] - 0.4) < EPSILON);
-  assert(std::fabs(b[4] - 0.5) < EPSILON);
+  assert(std::fabs(b[0] - 0.1) < epsilon);
+  assert(std::fabs(b[1] - 0.2) < epsilon);
+  assert(std::fabs(b[2] - 0.3) < epsilon);
+  assert(std::fabs(b[3] - 0.4) < epsilon);
+  assert(std::fabs(b[4] - 0.5) < epsilon);
 
   std::cout << "Test Diagonal Sparse System: Passed" << std::endl;
   }
@@ -217,15 +217,24 @@ std::pair<int, int> testAllCases() {
   int failed = 0, ntests = 0;
   failed += testSimpleSystem();
   ntests++;
+
+  //
   failed += testSingularMatrix();
   ntests++;
+
+  //
   failed += testZeroMatrix();
   ntests++;
+
+  //
   failed += testRectangularMatrix();
   ntests++;
+
+  //
   failed += testDiagonalSparseSystem();
   ntests++;
 
+  //
 	results.first = ntests;
 	results.second = failed;
 	return results;
@@ -233,6 +242,7 @@ std::pair<int, int> testAllCases() {
 
 int main() {
 
+	
 	auto results = testAllCases();
   std::cout << (results.first - results.second) << "/" << results.first << " tests passed!" << std::endl;
   return 0;
