@@ -24,62 +24,7 @@ The code serves best as a learning tool for understanding sparse matrix storage 
 
 ## Usage
 
-To use the solver, include the `SparseLinearSolver.h` header in your project and link against the `SparseLinearSolver.cpp` implementation. The main functionality is encapsulated in the `SparseSolver` namespace, with the `SparseMatrix` class representing the sparse matrix and the `Solver` class providing the solving capabilities.
-
-### Example
-
-```cpp
-#include "SparseLinearSolver.h"
-
-int main() {
-  int nError = 0;
-
-  const int n = 3;   // 3x3 system
-  const int nnz = 7; // Number of non-zero elements
-
-  SparseSolver::SparseMatrix A(n, n, nnz);
-  double* b = new double[n] {0.0};
-  b[0] = 8.0;
-  b[1] = -11.0;
-  b[2] = -3.0;
-
-	// define the matrix entries 
-  int rows[] = { 0, 0, 0, 1, 1, 1, 2 };
-  int cols[] = { 0, 1, 2, 0, 1, 2, 2 };
-  double vals[] = { 2.0, 1.0, -1.0, -3.0, -1.0, 2.0, 2.0 };
-
-	// Add non-zero values (we could do this element by element instead of giving a list of values)
-  A.addValue(rows, cols, vals, nnz);
-
-	// Finalize the matrix
-	A.finalize();
-
-  try {
-    // Solve the system
-    SparseSolver::Solver::solve(A, b);
-	
-	std::cout << "Solution: " << b[0] << ", " << b[1] << ", " << b[2] << std::endl;
-
-    // Check the solution
-    assert(std::fabs(b[0] - 1.5) < epsilon);
-    assert(std::fabs(b[1] - 3.5) < epsilon);
-    assert(std::fabs(b[2] + 1.5) < epsilon);
-    std::cout << "Test Simple System: Passed" << std::endl;
-  }
-  catch (const std::runtime_error& e) {
-    std::cout << "Test Simple Matrix: Failed (" << e.what() << ")" << std::endl;
-    nError = 1;
-  }
-
-	// clean memory
-	delete[] b;
-	b = nullptr;
-
-  return nError;    
-
-    return 0;
-}
-```
+To use the solver, include the `SparseLinearSolver.h` header in your project and link against the `SparseLinearSolver.cpp` implementation. The main functionality is encapsulated in the `SparseSolver` namespace, with the `SparseMatrix` class representing the sparse matrix and the `Solver` class providing the solving capabilities. Examples and unit tests are included in the `main.cpp` included in the repository. 
 
 ## Implementation Details
 
