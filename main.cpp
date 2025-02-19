@@ -205,14 +205,14 @@ int testDiagonalSparseSystem() {
     nError = 1;
   }
 
-
   delete[] b;
   b = nullptr;
 
   return nError;
 }
 
-int main() {
+std::pair<int, int> testAllCases() {
+  std::pair<int, int> results;
 
   int failed = 0, ntests = 0;
   failed += testSimpleSystem();
@@ -226,6 +226,14 @@ int main() {
   failed += testDiagonalSparseSystem();
   ntests++;
 
-  std::cout << (ntests - failed) << "/" << ntests << " tests passed!" << std::endl;
+	results.first = ntests;
+	results.second = failed;
+	return results;
+}
+
+int main() {
+
+	auto results = testAllCases();
+  std::cout << (results.first - results.second) << "/" << results.first << " tests passed!" << std::endl;
   return 0;
 }
