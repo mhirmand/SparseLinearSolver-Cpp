@@ -5,6 +5,8 @@
 
 namespace SparseSolver {
 
+  double epsilon = 1e-10; // Default tolerance for floating-point comparisons
+
   // constructor for SparseMatrix class
   SparseMatrix::SparseMatrix(int rows, int cols, int nnz)
     : numRows(rows), numCols(cols), numNonZero(nnz), finalized(false), currentNNZ(0) {

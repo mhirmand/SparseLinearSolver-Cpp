@@ -7,11 +7,6 @@
 
 namespace SparseSolver {
 
-	double epsilon = 1e-10; // Default tolerance for floating-point comparisons
-
-	// Set the tolerance for floating-point comparisons.
-	// void setEpsilon(double e) { epsilon = e; return; }
-
 	class SparseMatrix {
 	public:
 		double* values;    // Non-zero values
@@ -43,13 +38,14 @@ namespace SparseSolver {
 		// Solve the linear system Ax = b using Gaussian elimination.
 		//		- The solution is stored in the b array. 
 		//		- A is modified in place.
-		static void solve(SparseMatrix& A, double *& b, const double tolerance = epsilon);
+		static void solve(SparseMatrix& A, double *& b, const double tolerance = 1e-10);
 	private:
 		// Perform forward elimination to convert the matrix to upper triangular form.
-		static void forwardElimination(const SparseMatrix& A, double*& b, const double tolerance = epsilon);
+		static void forwardElimination(const SparseMatrix& A, double*& b, const double tolerance = 1e-10);
 
 		// Perform backward substitution to solve the system.
 		static void backwardSubstitution(const SparseMatrix& A, double*& b);
+
 	};
 }
 

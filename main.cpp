@@ -3,13 +3,15 @@
 #include <cmath>
 #include "SparseLinearSolver.h"
 
+#define EPSILON 1e-10
+
 using namespace SparseSolver;
 
 int testSimpleSystem() {
 
   int nError = 0;
 
-  const int n = 3; // 3x3 system
+  const int n = 3;   // 3x3 system
   const int nnz = 7; // Number of non-zero elements
 
   SparseSolver::SparseMatrix A(n, n, nnz);
@@ -18,26 +20,25 @@ int testSimpleSystem() {
   b[1] = -11.0;
   b[2] = -3.0;
 
-  // double x[n] = { 0 };
+	// define the matrix entries 
   int rows[] = { 0, 0, 0, 1, 1, 1, 2 };
   int cols[] = { 0, 1, 2, 0, 1, 2, 2 };
   double vals[] = { 2.0, 1.0, -1.0, -3.0, -1.0, 2.0, 2.0 };
 
-  // Add non-zero values
+	// Add non-zero values (we could do this element by element instead of giving a list of values)
   A.addValue(rows, cols, vals, nnz);
 
 	// Finalize the matrix
 	A.finalize();
-
 
   try {
     // Solve the system
     SparseSolver::Solver::solve(A, b);
 
     // Check the solution
-    assert(std::fabs(b[0] - 1.5) < epsilon);
-    assert(std::fabs(b[1] - 3.5) < epsilon);
-    assert(std::fabs(b[2] + 1.5) < epsilon);
+    assert(std::fabs(b[0] - 1.5) < EPSILON);
+    assert(std::fabs(b[1] - 3.5) < EPSILON);
+    assert(std::fabs(b[2] + 1.5) < EPSILON);
     std::cout << "Test Simple System: Passed" << std::endl;
   }
   catch (const std::runtime_error& e) {
@@ -191,11 +192,11 @@ int testDiagonalSparseSystem() {
   SparseSolver::Solver::solve(A, b);
 
   // Check the solution
-  assert(std::fabs(b[0] - 0.1) < epsilon);
-  assert(std::fabs(b[1] - 0.2) < epsilon);
-  assert(std::fabs(b[2] - 0.3) < epsilon);
-  assert(std::fabs(b[3] - 0.4) < epsilon);
-  assert(std::fabs(b[4] - 0.5) < epsilon);
+  assert(std::fabs(b[0] - 0.1) < EPSILON);
+  assert(std::fabs(b[1] - 0.2) < EPSILON);
+  assert(std::fabs(b[2] - 0.3) < EPSILON);
+  assert(std::fabs(b[3] - 0.4) < EPSILON);
+  assert(std::fabs(b[4] - 0.5) < EPSILON);
 
   std::cout << "Test Diagonal Sparse System: Passed" << std::endl;
   }
