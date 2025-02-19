@@ -1,4 +1,4 @@
-# C++ SparseLinearSolver
+# C++ Sparse Matrix Solver
 
 This C++ project demonstrates the solution of sparse linear systems using Gaussian Elimination. The implementation uses the **Compressed Row Storage (CRS)** format for efficient storage and manipulation of sparse matrices. This code is designed for **demonstration purposes** and may not be optimal for solving large systems.
 
