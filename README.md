@@ -12,10 +12,6 @@ This C++ project demonstrates the solution of sparse linear systems using Gaussi
    - [SparseMatrix Class](#sparsematrix-class)
    - [Solver Class](#solver-class)
 4. [Time and Memory Complexity](#time-and-memory-complexity)
-5. [Limitations](#limitations)
-6. [License](#license)
-
----
 
 ## Purpose
 
@@ -25,8 +21,6 @@ The purpose of this code is to demonstrate how to solve sparse linear systems of
 - Rectangular matrices
 
 The code serves best as a learning tool for understanding sparse matrix storage and linear system solvers.
-
----
 
 ## Usage
 
@@ -85,6 +79,7 @@ int main() {
 
     return 0;
 }
+```
 
 ## Implementation Details
 
@@ -96,35 +91,34 @@ The `SparseMatrix` class represents a sparse matrix in **Compressed Row Storage 
 - **addValue**: Adds non-zero values to the matrix.
 - **finalize**: Converts the matrix to CRS format for efficient storage and computation.
 
-### Key Members:
+#### Key Members:
 - `values`: Array of non-zero values.
 - `rowIndex`: Array of row pointers.
 - `colIndex`: Array of column indices.
 - `numRows`, `numCols`, `numNonZero`: Dimensions and number of non-zero elements.
 
----
 
-# Solver Class
+
+### Solver Class
 
 The `Solver` class provides the functionality to solve the linear system \( Ax = b \) using Gaussian Elimination. It consists of two main steps:
 
 1. **Forward Elimination**: Transforms the matrix into an upper triangular form.
 2. **Backward Substitution**: Solves for the unknowns using back substitution.
 
-### Key Methods:
+#### Key Methods:
 - `solve`: Solves the system \( Ax = b \).
 - `forwardElimination`: Performs forward elimination to reduce the matrix to upper triangular form.
 - `backwardSubstitution`: Solves the system using back substitution.
 
----
+## Time and Memory Complexity
 
-# Time and Memory Complexity
-
-## Time Complexity
+### Time Complexity
 - **Gaussian Elimination**: The algorithm has a time complexity of \( O(n^3) \) for dense matrices. For sparse matrices, the complexity depends on the sparsity pattern but is generally lower.
 - **Forward Elimination**: \( O(n^3) \) in the worst case.
 - **Backward Substitution**: \( O(n^2) \).
 
-## Memory Complexity
+### Memory Complexity
 - The **Compressed Row Storage (CRS)** format ensures efficient memory usage:
   - \( O(n + nnz) \) space complexity, where \( n \) is the number of rows and \( nnz \) is the number of non-zero elements.
+ 
