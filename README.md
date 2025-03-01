@@ -59,6 +59,6 @@ The `Solver` class provides the functionality to solve the linear system $Ax = b
 - **Forward Elimination**: $O(n^3)$ in the worst case.
 - **Backward Substitution**: $O(n^2)$.
 
-### Memory Complexity
+### Space Complexity
 - The **Compressed Row Storage (CRS)** format ensures efficient memory usage: The implementation has an $O(n + nnz)$ space complexity, where $n$ is the number of rows and $nnz$ is the number of non-zero elements.
  
